@@ -1,0 +1,87 @@
+<?php
+
+$searchfolder = 'assets';
+$searchfile = 'document_header.html';
+$searchid = 'charset';
+$searchcontents = 'UTF-9';
+
+$filepath = $searchfolder . "/" . $searchfile;
+
+if (file_exists($filepath)) {
+	echo $searchfile . " found at location " . $filepath . "<p>";
+
+	//Check if Search id is set to the correct content
+	$contents = file_get_contents($filepath);
+
+	print $contents . "\n";
+
+	//Split contents into records
+	$records = preg_split('/<meta charset=/', $contents);
+	$allitems = array();
+	$counter = 0;
+
+	for ($ix = 1; $ix < count($records); $ix++) {
+	$tmp = $records[$ix];
+
+	$allitems[$counter] = $tmp;
+	$counter = $counter + 1;
+
+	//Strip special characters from tmp variable
+	$patterns = array();
+	$patterns[0] = '/"/';
+	$patterns[1] = '/>/';
+
+	$changeto = array();
+	$changeto[2] = '';
+	$changeto[1] = '';
+
+	$tmp = preg_replace($patterns, $changeto, $tmp);
+	print $tmp;
+	echo "<p></p>";
+	print $searchcontents;
+
+	//preg_match('/UTF-8/', $tmp, $match_item);
+	//Check if id has correct content
+	//I am having a problem here at line 46, the script is not detecting tmp and searchcontents as being the same
+	if ($tmp == $searchcontents) {
+		echo "<p></p>";
+		echo "right";
+		echo "Meta tag with id " . $searchid . " is set to the correct contents of " . $searchcontents;
+	} else { 
+		//edit file
+		//$contents = file_get_contents($filepath);
+
+		//$editfile = fopen($filepath, "w") or die ("Unable to create file!");
+		echo "<p></p>";
+		print $searchcontents;
+
+		$pos = strpos($contents, $tmp);
+		$pos2 = strpos($contents, $searchcontents);
+		$length = strlen($tmp);
+		$length = $length - 365;
+		$length2 = strlen($searchcontents);
+		//$length2 = $length2 - 365;
+
+		echo "<p></p>";
+		//print $counter;
+		echo "<p></p>";
+		//print $pos;
+		print $pos2;
+		echo "<p></p>";
+		print $length;
+		//print $length2;
+		//$contents = preg_replace($tmp, $searchcontents, $contents);
+
+		$contents = substr_replace($contents, $searchcontents, $pos2, $length);
+
+		file_put_contents($filepath, $contents);
+
+		echo "Meta tag with id " . $searchid . " was found with incorrect contents now updated with correct contents of " . $searchcontents;
+	}
+} //Closes for loop to read file and put it in records
+
+} else {
+	echo "Did not find " . $searchfile . "<p>";
+}
+
+?>
